@@ -31,6 +31,8 @@ export const CHANNEL_TYPE_VLLM = 62
 
 export const CHANNEL_TYPE_SGLANG = 63
 
+export const CHANNEL_TYPE_QCA = 64
+
 export const CHANNEL_TYPES = {
   0: 'Unknown',
   1: 'OpenAI',
@@ -92,6 +94,7 @@ export const CHANNEL_TYPES = {
   61: 'Task Plugin',
   62: 'vLLM',
   63: 'SGLang',
+  64: 'QCA',
 } as const
 
 export type ChannelProviderPresentation = {
@@ -173,6 +176,7 @@ export const CHANNEL_PROVIDER_PRESENTATION: Partial<
   },
   62: { descriptionKey: 'Connect to self-hosted models served by vLLM' },
   63: { descriptionKey: 'Connect to self-hosted models served by SGLang' },
+  64: { descriptionKey: 'Connect to agents provisioned on Qoder Cloud Agent' },
 } satisfies Record<
   Exclude<keyof typeof CHANNEL_TYPES, 0 | typeof CHANNEL_TYPE_TASK_PLUGIN>,
   ChannelProviderPresentation
@@ -563,6 +567,7 @@ export const TYPE_TO_KEY_PROMPT: Record<number, string> = {
   60: 'Enter API key for this channel',
   62: 'vLLM API key, or EMPTY if authentication is disabled',
   63: 'SGLang API key, or EMPTY if authentication is disabled',
+  64: 'QCA access token (pt-...)',
 }
 
 export const CHANNEL_TYPE_WARNINGS: Record<number, string> = {

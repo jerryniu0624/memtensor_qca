@@ -139,6 +139,7 @@ import {
   CHANNEL_STATUS_LABELS,
   CHANNEL_TYPE_OLLAMA,
   CHANNEL_TYPE_OPTIONS,
+  CHANNEL_TYPE_QCA,
   CHANNEL_TYPE_TASK_PLUGIN,
   CHANNEL_TYPE_VLLM,
   CHANNEL_TYPE_SGLANG,
@@ -269,6 +270,7 @@ const SENSITIVE_FORM_FIELDS = [
   'vertex_key_type',
   'aws_key_type',
   'azure_responses_version',
+  'qca_environment_id',
   'force_format',
   'thinking_to_content',
   'proxy',
@@ -3624,6 +3626,31 @@ export function ChannelMutateDrawer({
                     </FormControl>
                     <FormDescription>
                       {t('Enter the Coze agent ID')}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {/* QCA (type 64) */}
+            {currentType === CHANNEL_TYPE_QCA && (
+              <FormField
+                control={form.control}
+                name='qca_environment_id'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel required>{t('QCA Environment ID')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t('e.g., env_00p590j3tga2p16lcsi3')}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t(
+                        'The QCA environment every request runs in. Map each model name to its QCA Agent ID in the model mapping below.'
+                      )}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

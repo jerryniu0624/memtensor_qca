@@ -95,6 +95,9 @@ type ChannelOtherSettings struct {
 	// rejection. Empty follows the default allow policy. Accepted values:
 	// "", "allow", "safe", "strict".
 	ToolLossPolicy string `json:"tool_loss_policy,omitempty"`
+	// QCAEnvironmentID is the Qoder Cloud Agent environment a QCA channel runs
+	// its sessions in. Every POST /sessions requires it.
+	QCAEnvironmentID string `json:"qca_environment_id,omitempty"`
 }
 
 func (s *ChannelOtherSettings) IsOpenRouterEnterprise() bool {

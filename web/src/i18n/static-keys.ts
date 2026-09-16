@@ -89,6 +89,9 @@ export const STATIC_I18N_KEYS = [
   'Connect to self-hosted models served by vLLM',
   'vLLM server address, without /v1',
   'vLLM API key, or EMPTY if authentication is disabled',
+  'QCA',
+  'Connect to agents provisioned on Qoder Cloud Agent',
+  'QCA access token (pt-...)',
 
   'Price per image',
   'Per image',
