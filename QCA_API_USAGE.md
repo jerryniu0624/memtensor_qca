@@ -1,7 +1,8 @@
 # QCA 渠道 API 调用手册
 
 面向**调用方**：管理员已按 `QCA_CHANNEL.md` 建好 QCA 渠道（渠道类型 64）之后，
-客户端如何用标准 API 调用它。部署与渠道配置请看 `QCA_CHANNEL.md`。
+客户端如何用标准 API 调用它。部署与上线措施请看 `QCA_DEPLOYMENT.md`，
+协议原理与代码改动清单请看 `QCA_CHANNEL.md`。
 
 下面所有响应都是**实测抓包**（new-api 实例 + QCA 渠道，模型 `*-qca`），
 替换 Base URL / 令牌 / 模型名即可复现。
