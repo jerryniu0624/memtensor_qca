@@ -94,7 +94,7 @@ Docker 部署沿用官方镜像构建流程即可，不需要额外服务或额�
 
 ### 2.3 在控制台创建渠道
 
-1. 渠道 → 新建，**类型选择 `QCA`**（类型号 64）。
+1. 渠道 → 新建渠道，在「选择供应商」里选 **`QCA`**（类型号 64；搜索框可输 `QCA` 或 `64`）。
 2. **密钥**：填 QCA 的 PAT（`pt-...`）。
 3. **Base URL**：留空即用内置默认 `https://api.qoder.com/api/v1/cloud`，走内网代理时才填。
 4. **QCA Environment ID**：填 `env_...`，必填，缺失时请求会直接报错。
@@ -131,6 +131,10 @@ Docker 部署沿用官方镜像构建流程即可，不需要额外服务或额�
 
 > **计费**：这些模型名默认没有价格。要么在「模型价格」里补价，要么开启自用模式
 > （SelfUseMode），否则请求会被计价校验拦下。
+
+> **类型列表里没有 QCA**：说明当前控制台的前端不是本仓库构建的。`web/dist` 被 gitignore，
+> 需要 `cd web && bun install && bun run build`（Docker 构建会自动做）后重启进程，
+> 详见 `QCA_DEPLOYMENT.md` §2.1 与 §8.2；这期间可以用管理 API 直接建渠道。
 
 ### 2.4 验收
 
@@ -220,6 +224,7 @@ QCA 渠道额外验证：流式帧序正确；`/v1/messages` 返回 200 且 SSE 
 | `web/src/features/channels/lib/channel-utils.ts` | 渠道图标映射增加 `64` |
 | `web/src/features/channels/lib/channel-form.ts` | 表单字段 `qca_environment_id`：schema、默认值、回填、写入 settings JSON |
 | `web/src/features/channels/components/drawers/channel-mutate-drawer.tsx` | QCA 类型的 Environment ID 输入框，并纳入敏感字段校验 |
+| `web/src/assets/custom/icon-qca.tsx`、`web/src/lib/lobe-icon.tsx` | QCA 渠道图标：`@lobehub/icons` 没有该品牌，按项目既有做法注册自定义 SVG 图标，避免列表里显示占位符 |
 | `web/src/i18n/static-keys.ts`、`locales/en.json`、`locales/zh.json` | 新增文案的 i18n key；其余语言回退英文，可用 `bun run i18n:sync` 补齐 |
 
 ### 3.4 验证命令
@@ -229,4 +234,9 @@ gofmt -l relay/channel/qca                 # 无输出
 go build ./...                             # 通过
 go test ./relay/channel/qca/...            # ok
 cd relaykit && GOWORK=off go build ./...   # relaykit 模块独立性校验，通过
+
+# 前端（生成 go:embed 需要的 web/dist，并确认类型 64 进了产物）
+cd web && bun install && bun run build     # 本机没有 bun 时用 npm install && npm run build
+grep -rl "Qoder Cloud Agent" dist          # 有命中
+bun run test src/features/channels         # 14 个测试文件 / 166 个用例全通过
 ```
