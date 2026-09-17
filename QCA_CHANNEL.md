@@ -51,6 +51,11 @@ QCA = Qoder Cloud Agent，上游地址 `https://api.qoder.com/api/v1/cloud`。
 | Environment ID | `env_...` | 渠道 settings 的 `qca_environment_id` |
 | Agent ID | `agent_...` | 渠道「模型映射」的 value，每个对外模型一个 Agent |
 
+Environment ID 用 `GET $QCA_BASE_URL/environments`（带 PAT）列出后挑一个未归档的即可。
+它是**渠道级**配置：一个渠道填一个，渠道下所有模型、所有会话共用同一个环境，
+已实测并发无冲突。本仓库实测用 `env_00p590j3tga2p16lcsi3`（`openai-compat-adapter-env`），
+备选 `env_00pmas5vnpfyaxk8ebs6`（`new-api-qca-local-0916`）；换 PAT 后需换成自己名下的环境。
+
 QCA `/models` 只暴露抽象模型 id，实测可用：
 `dfmodel`(DeepSeek-Flash)、`dmodel`(DeepSeek-V4-Pro)、`kmodel_latest`(Kimi-K3)、
 `gmodel`(GLM-5.3)、`qmodel`(Qwen3.7-Plus)。

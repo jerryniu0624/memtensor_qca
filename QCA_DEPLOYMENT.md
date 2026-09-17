@@ -32,7 +32,7 @@
 | 数据库 | SQLite（默认，落在数据目录）/ MySQL ≥ 5.7.8 / PostgreSQL ≥ 9.6 |
 | 缓存 | 可选 Redis（多节点或需要分布式限流时） |
 | 出站网络 | 必须能访问 `api.qoder.com:443`；QCA 走 SSE 长响应，链路上不能强制缓冲或短超时 |
-| QCA 资源 | Access Token（`pt-...`）、Environment ID（`env_...`）、每个对外模型一个 bridge-ready Agent（`agent_...`） |
+| QCA 资源 | Access Token（`pt-...`）、Environment ID（`env_...`，`GET /environments` 可列出）、每个对外模型一个 bridge-ready Agent（`agent_...`） |
 | 容量 | QCA 渠道无状态（每请求新建 Session），实例可水平扩展，不需要会话粘性 |
 
 ---
@@ -264,6 +264,19 @@ curl -sS -X POST "$QCA_BASE_URL/agents" \
 - 工具要配在 Agent 侧（`agent_toolset` / `mcp_servers`）；依赖客户端执行工具的 Agent
   会让请求以 `stop_reason=requires_action` 失败。
 
+列出你名下的 Environment ID（渠道级配置，一个渠道填一个即可；多模型、多会话共用同一个
+已实测没有问题）：
+
+```bash
+curl -sS "$QCA_BASE_URL/environments" -H "Authorization: Bearer $QCA_TOKEN" \
+  | python3 -c 'import json,sys;[print(e["id"], e["name"], e["archived_at"]) for e in json.load(sys.stdin)["data"]]'
+```
+
+本仓库实测用的是 `env_00p590j3tga2p16lcsi3`（`openai-compat-adapter-env`，未归档、
+`networking=limited`）；同一 PAT 名下另有 `env_00pmas5vnpfyaxk8ebs6`
+（`new-api-qca-local-0916`）可作备选。这两个 ID 属于我们的 PAT，客户换自己的 PAT 后
+必须换成自己名下的环境 ID。
+
 ### 8.2 控制台创建（前提：前端已按本仓库重新构建）
 
 1. 渠道 → 新建渠道，在「选择供应商」弹窗里选 **QCA**（属「内置」分类；搜索框可直接输
@@ -271,7 +284,8 @@ curl -sS -X POST "$QCA_BASE_URL/agents" \
 2. 密钥：QCA 的 PAT（`pt-...`）。
 3. Base URL：留空即用内置默认 `https://api.qoder.com/api/v1/cloud`；要走出网代理才填，
    或在「代理」字段单独配代理。
-4. QCA Environment ID：`env_...`（**必填**，缺失时请求直接报错）。
+4. QCA Environment ID：`env_...`（**必填**，缺失时请求直接报错）；实测可用值见 §8.1 末尾，
+   例如 `env_00p590j3tga2p16lcsi3`。
 5. 模型：声明要对外暴露的模型名，例如 `glm-5.3-qca`（渠道不内置模型列表）。
 6. 模型映射：把每个模型名映射到它的 Agent ID —— 这是选定 Agent 的唯一方式。
 7. 测试模型：填一个已映射的模型名，便于用「测试」按钮巡检（会真实调用 QCA）。
@@ -283,7 +297,8 @@ curl -sS -X POST "$QCA_BASE_URL/agents" \
 > 或按 §4 重新构建前端后重启进程。前端一时构建不出来时，直接用 §8.3 的管理 API 建渠道，
 > 渠道建成后列表里会以 QCA 徽标显示，转发功能不受前端影响。
 
-落库后的关键字段等价于：
+落库后的关键字段等价于（下例中的 Agent / Environment ID 是我们 PAT 名下的实测值，
+客户需换成自己的）：
 
 ```json
 {
@@ -291,8 +306,8 @@ curl -sS -X POST "$QCA_BASE_URL/agents" \
   "base_url": "https://api.qoder.com/api/v1/cloud",
   "key": "pt-xxxxxxxx",
   "models": "glm-5.3-qca,kimi-k3-qca",
-  "model_mapping": "{\"glm-5.3-qca\":\"agent_xxx\",\"kimi-k3-qca\":\"agent_yyy\"}",
-  "settings": "{\"qca_environment_id\":\"env_xxx\"}"
+  "model_mapping": "{\"glm-5.3-qca\":\"agent_00plqztiklm9se41xjvx\",\"kimi-k3-qca\":\"agent_00plqzsv4l8u813hwcg1\"}",
+  "settings": "{\"qca_environment_id\":\"env_00p590j3tga2p16lcsi3\"}"
 }
 ```
 
@@ -322,10 +337,10 @@ curl -s -X POST "$BASE/api/channel/" -H "Authorization: Bearer $TOKEN" \
     "base_url": "",
     "models": "glm-5.3-qca,kimi-k3-qca",
     "group": "default",
-    "model_mapping": "{\"glm-5.3-qca\":\"agent_xxx\",\"kimi-k3-qca\":\"agent_yyy\"}",
+    "model_mapping": "{\"glm-5.3-qca\":\"agent_00plqztiklm9se41xjvx\",\"kimi-k3-qca\":\"agent_00plqzsv4l8u813hwcg1\"}",
     "test_model": "glm-5.3-qca",
     "setting": "{}",
-    "settings": "{\"qca_environment_id\":\"env_xxx\"}"
+    "settings": "{\"qca_environment_id\":\"env_00p590j3tga2p16lcsi3\"}"
   }}'
 
 # 4) 签发客户端令牌（生产建议给额度与有效期，不要 unlimited）
